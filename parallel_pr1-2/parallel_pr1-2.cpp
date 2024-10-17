@@ -2,6 +2,7 @@
 #include <thread>
 #include <chrono>
 #include <mutex>
+#include <functional>
 #include "mtxMult.h"
 
 using namespace std::chrono_literals;
@@ -9,6 +10,23 @@ using namespace std::chrono_literals;
 constexpr int iterations = 10;
 constexpr auto sleepTime = 1000ms;
 
+
+
+template <class T>
+double startAndGetTimer(T (T::* method)(const T&),T& mat1, const T& mat2)
+{
+    const auto start = std::chrono::high_resolution_clock::now();
+    (mat1.*method)(mat2);
+    const auto end = std::chrono::high_resolution_clock::now();
+    const std::chrono::duration<double, std::milli> elapsed = end - start;
+    return elapsed.count();
+}
+
+template <class T>
+void startThread(T(T::* method)(const T&), T& mat1, const T& mat2, std::thread*& th)
+{
+    th = new std::thread([&mat1, &mat2, &method]() {(mat1.*method)(mat2);});
+}
 
 void sleepTest(double* res)
 {
@@ -147,9 +165,44 @@ int main()
     Matrix mat2(b,3,3);
     Matrix mat3(mat1);
 
-    mat3 = (mat1 + mat2);
-    std::cout << "Mat3 add" << &mat3<<std::endl;
-    mat3.outMatr();
+    //mat3 = (mat1 + mat2);
+    //std::cout << "Mat3 add" << &mat3<<std::endl;
+    //mat3.outMatr();
+    const auto startSync = std::chrono::high_resolution_clock::now();
+    double sumTime = startAndGetTimer(&Matrix::operator+, mat1, mat2);
+    std::cout << "Время суммирования " << sumTime<<" ms" << std::endl;
+    sumTime = startAndGetTimer(&Matrix::operator-, mat1, mat2);
+    std::cout << "Время вычитания " << sumTime << " ms" << std::endl;
+    sumTime = startAndGetTimer(&Matrix::operator*, mat1, mat2);
+    std::cout << "Время умножения " << sumTime << " ms" << std::endl;
+    const auto endSync = std::chrono::high_resolution_clock::now();
+    const std::chrono::duration<double, std::milli> elapsedSync = endSync - startSync;
+    std::cout << "Однопоточное выполнение операций заняло: " << elapsedSync.count() << "мс" << std::endl;
+
+
+    const auto startAsync = std::chrono::high_resolution_clock::now();
+    std::thread th1([&mat1, &mat2]() {(mat1 + mat2); });
+    std::thread th2([&mat1, &mat2]() {(mat1 - mat2); });
+    std::thread th3([&mat1, &mat2]() {(mat1 * mat2); });
+    th1.join();
+    th2.join();
+    th3.join();
+    /*std::thread* th1 = nullptr;
+    std::thread* th2 = nullptr;
+    std::thread* th3 = nullptr;*/
+    /*startThread(&Matrix::operator+, mat1, mat2, th1); Вопрос со *, надо будет разобратся с более сложны ветвлением потоков
+    startThread(&Matrix::operator-, mat1, mat2, th2);   так как вызов потока из функции, которая сама запускается в каком-либо потоке
+    startThread(&Matrix::operator*, mat1, mat2, th3);   для решения скорее всего надо использовать более новые библиотеки*/
+    /*th1->join();
+    th2->join();
+    th3->join();*/
+    //delete th1;
+    //delete th2;
+    //delete th3;
+    const auto endAsync = std::chrono::high_resolution_clock::now();
+    const std::chrono::duration<double, std::milli> elapsedAsync = endAsync - startAsync;
+    std::cout << "Многопоточное выполнение операций заняло: " << elapsedAsync.count() << "мс" << std::endl;
+
     //(mat1 + mat2).outMatr();
     //(mat1 - mat2).outMatr();
     //(mat1 * mat2).outMatr();
@@ -181,8 +234,6 @@ int main()
     delete[] b[2],
     delete[] b[1],
     delete[] b[0];
-    delete[] a,
-    delete[] b;
     const auto end = std::chrono::high_resolution_clock::now();
     const std::chrono::duration<double, std::milli> elapsed = end - start;
     std::cout << "Выполнение программы заняло: " << elapsed.count() << "мс";

@@ -16,14 +16,14 @@ public:
 	Matrix(const Matrix& m);
 	~Matrix();
 	void clearElsMem();
-	int* getColumn(int j);
+	int* getColumn(int j) const;
 	int matrixMultRowOnColumn(int* a, int* b);
 	void outMatr();
 	void outMatr(Matrix& m);
 	static void staticOutMatr(Matrix& m);
 	Matrix operator+(const Matrix& m);
 	Matrix& operator=(const Matrix& m);
-	Matrix operator-(Matrix& m);
-	Matrix operator*(Matrix& m);
+	Matrix operator-(const Matrix& m);
+	Matrix operator*(const Matrix& m);
 	void matrMult(Matrix& m1, Matrix& m2, Matrix& result);
 };

@@ -144,7 +144,7 @@ void Matrix::clearElsMem()
 	//delete[]this->els;
 }
 
-int* Matrix::getColumn(int j)
+int* Matrix::getColumn(int j) const
 {
 	int* res = new int[this->rows];
 	for (int i = 0; i < this->rows; i++)
@@ -202,6 +202,7 @@ void Matrix::staticOutMatr(Matrix& m)
 
 Matrix Matrix::operator+(const Matrix& m)
 {
+	std::cout << "Sum start" << std::endl;
 	Matrix result(this->els, this->columns, m.rows);
 	for (int i = 0; i < this->rows; i++)
 	{
@@ -211,8 +212,7 @@ Matrix Matrix::operator+(const Matrix& m)
 			std::this_thread::sleep_for(50ms);
 		}
 	}
-	std::cout << "Sum ended"<<&result<<std::endl;
-	result.outMatr();
+	std::cout << "Sum ended" << std::endl;
 	return result;
 }
 
@@ -238,7 +238,7 @@ Matrix& Matrix::operator=(const Matrix& m)
 	return *this;
 }
 
-Matrix Matrix::operator-(Matrix& m)
+Matrix Matrix::operator-(const Matrix& m)
 {
 	std::cout << "Sub start\n";
 	Matrix result(this->els, this->columns, m.rows);
@@ -254,7 +254,7 @@ Matrix Matrix::operator-(Matrix& m)
 	return result;
 }
 
-Matrix Matrix::operator*(Matrix& m)
+Matrix Matrix::operator*(const Matrix& m)
 {
 	std::cout << "Mult start\n";
 	Matrix result(this->els, this->columns, m.rows);
