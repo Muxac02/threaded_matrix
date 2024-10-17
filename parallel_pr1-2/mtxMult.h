@@ -13,7 +13,7 @@ public:
 	Matrix();
 	Matrix(int r, int c);
 	Matrix(int** els, int r, int c);
-	Matrix(Matrix& m);
+	Matrix(const Matrix& m);
 	~Matrix();
 	void clearElsMem();
 	int* getColumn(int j);
@@ -21,8 +21,8 @@ public:
 	void outMatr();
 	void outMatr(Matrix& m);
 	static void staticOutMatr(Matrix& m);
-	Matrix operator+(Matrix& m);
-	Matrix& operator=(Matrix& m);
+	Matrix operator+(const Matrix& m);
+	Matrix& operator=(const Matrix& m);
 	Matrix operator-(Matrix& m);
 	Matrix operator*(Matrix& m);
 	void matrMult(Matrix& m1, Matrix& m2, Matrix& result);

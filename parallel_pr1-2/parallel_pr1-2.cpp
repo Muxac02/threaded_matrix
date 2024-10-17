@@ -1,12 +1,14 @@
 ﻿#include <iostream>
 #include <thread>
 #include <chrono>
+#include <mutex>
 #include "mtxMult.h"
 
 using namespace std::chrono_literals;
 
 constexpr int iterations = 10;
 constexpr auto sleepTime = 1000ms;
+
 
 void sleepTest(double* res)
 {
@@ -68,6 +70,7 @@ public:
 };
 int main()
 {
+    const auto start = std::chrono::high_resolution_clock::now();
     setlocale(LC_ALL, "rus");
     //double *sleeptestTime = new double(0.0);
     //std::thread th(sleepTest, sleeptestTime);//detach - отсоединение потока сразу, join - присоединение потока по завершению
@@ -80,7 +83,6 @@ int main()
     //std::thread th3(sum, 4, 5, a2);
     //th3.detach();
     //std::cout << std::endl;
-    ////const auto start = std::chrono::high_resolution_clock::now();
     //std::cout << "main started: \n";
     //for (int i = 0; i < iterations; i++)
     //{
@@ -88,8 +90,6 @@ int main()
     //    std::cout << "iteration " << i << " id: " << std::this_thread::get_id() << std::endl;
     //}
     //std::cout << "main ended.";
-    ////const auto end = std::chrono::high_resolution_clock::now();
-    ////const std::chrono::duration<double, std::milli> elapsed = end - start;
     ////std::cout << sleeptestTime;
     //th.join();
     //std::cout << *a <<" "<<*a2<<" " << *sleeptestTime << "ms"<<std::endl;
@@ -146,6 +146,10 @@ int main()
     Matrix mat1(a,3,3);
     Matrix mat2(b,3,3);
     Matrix mat3(mat1);
+
+    mat3 = (mat1 + mat2);
+    std::cout << "Mat3 add" << &mat3<<std::endl;
+    mat3.outMatr();
     //(mat1 + mat2).outMatr();
     //(mat1 - mat2).outMatr();
     //(mat1 * mat2).outMatr();
@@ -166,8 +170,11 @@ int main()
     //t3.join();
     //mat3.outMatr();
     //mat3.matrMult(mat1, mat2, mat3);
-    std::thread t10([&mat1, &mat2]() {(mat1 + mat2).outMatr(); });
-    t10.join();
+    
+    //std::thread t10([&mat1, &mat2]() {(mat1 + mat2).outMatr(); });
+    //t10.join();
+    //std::thread t11([&mat1, &mat2, &mat3] {mat3 = (mat1 + mat2); });
+   
     delete[] a[2],
     delete[] a[1],
     delete[] a[0],
@@ -176,5 +183,8 @@ int main()
     delete[] b[0];
     delete[] a,
     delete[] b;
+    const auto end = std::chrono::high_resolution_clock::now();
+    const std::chrono::duration<double, std::milli> elapsed = end - start;
+    std::cout << "Выполнение программы заняло: " << elapsed.count() << "мс";
     return 0;
 }

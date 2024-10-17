@@ -107,7 +107,7 @@ Matrix::Matrix(int** els, int r, int c)
 	}
 }
 
-Matrix::Matrix(Matrix& m)
+Matrix::Matrix(const Matrix& m)
 {
 	this->clearElsMem();
 	this->rows = m.rows;
@@ -130,9 +130,9 @@ Matrix::~Matrix()
 {
 	for (int i = 0; i < this->rows; i++)
 	{
-		delete []this->els[i];
+		delete[]this->els[i];
 	}
-	delete []this->els;
+	//delete[]this->els;
 }
 
 void Matrix::clearElsMem()
@@ -141,7 +141,7 @@ void Matrix::clearElsMem()
 	{
 		delete[]this->els[i];
 	}
-	delete[]this->els;
+	//delete[]this->els;
 }
 
 int* Matrix::getColumn(int j)
@@ -200,9 +200,8 @@ void Matrix::staticOutMatr(Matrix& m)
 	}
 }
 
-Matrix Matrix::operator+(Matrix& m)
+Matrix Matrix::operator+(const Matrix& m)
 {
-	std::cout << "Sum start\n";
 	Matrix result(this->els, this->columns, m.rows);
 	for (int i = 0; i < this->rows; i++)
 	{
@@ -212,11 +211,12 @@ Matrix Matrix::operator+(Matrix& m)
 			std::this_thread::sleep_for(50ms);
 		}
 	}
-	std::cout << "Sum ended\n";
+	std::cout << "Sum ended"<<&result<<std::endl;
+	result.outMatr();
 	return result;
 }
 
-Matrix& Matrix::operator=(Matrix& m)
+Matrix& Matrix::operator=(const Matrix& m)
 {
 	if (&m!=this)
 	{
