@@ -1,2 +1,4 @@
 ﻿  parallel_pr1-2.cpp
+C:\Users\Hewlett-Packard\source\repos\7sem\parallel_pr1-2\parallel_pr1-2\parallel_pr1-2.cpp(454,28): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\Hewlett-Packard\source\repos\7sem\parallel_pr1-2\parallel_pr1-2\parallel_pr1-2.cpp(444,15): warning C4101: q: неиспользованная локальная переменная
   parallel_pr1-2.vcxproj -> C:\Users\Hewlett-Packard\source\repos\7sem\parallel_pr1-2\x64\Debug\parallel_pr1-2.exe

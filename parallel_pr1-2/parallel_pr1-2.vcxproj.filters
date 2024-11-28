@@ -21,10 +21,16 @@
     <ClCompile Include="mtxMult.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="QuickSort.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mtxMult.h">
       <Filter>Исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="QuickSort.h">
+      <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

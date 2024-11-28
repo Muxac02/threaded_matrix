@@ -2,6 +2,9 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
+#include <mutex>
+
+std::mutex matr_latch;
 
 using namespace std::chrono_literals;
 
@@ -51,7 +54,7 @@ void outMatr(int** a, int n)
 	}
 }
 
-Matrix::Matrix()
+Matrix::Matrix(bool fillWithRandomElements)
 {
 	std::cout << "Введите размерность матрицы (строки, столбцы)";
 	std::cin >> this->rows>>this->columns;
@@ -60,17 +63,24 @@ Matrix::Matrix()
 	{
 		this->els[i] = new int[this->columns];
 	}
-	for (int i = 0; i < this->rows; i++)
+	if (!fillWithRandomElements)
 	{
-		for (int j = 0; j < this->columns; j++)
+		for (int i = 0; i < this->rows; i++)
 		{
-			std::cout << "Введите значение элемента M[" << i << "][" << j << "] = ";
-			std::cin >> this->els[i][j];
+			for (int j = 0; j < this->columns; j++)
+			{
+				std::cout << "Введите значение элемента M[" << i << "][" << j << "] = ";
+				std::cin >> this->els[i][j];
+			}
 		}
+	}
+	else
+	{
+		this->fillMatrixWithRandomElemets();
 	}
 }
 
-Matrix::Matrix(int r, int c)
+Matrix::Matrix(int r, int c, bool fillWithRandomElements)
 {
 	this->rows = r;
 	this->columns = c;
@@ -79,17 +89,24 @@ Matrix::Matrix(int r, int c)
 	{
 		this->els[i] = new int[this->columns];
 	}
-	for (int i = 0; i < this->rows; i++)
+	if (!fillWithRandomElements)
 	{
-		for (int j = 0; j < this->columns; j++)
+		for (int i = 0; i < this->rows; i++)
 		{
-			std::cout << "Введите значение элемента M[" << i << "][" << j << "] = ";
-			std::cin >> this->els[i][j];
+			for (int j = 0; j < this->columns; j++)
+			{
+				std::cout << "Введите значение элемента M[" << i << "][" << j << "] = ";
+				std::cin >> this->els[i][j];
+			}
 		}
+	}
+	else
+	{
+		this->fillMatrixWithRandomElemets();
 	}
 }
 
-Matrix::Matrix(int** els, int r, int c)
+Matrix::Matrix(int** els, int r, int c, bool fillWithRandomElements)
 {
 	this->rows = r;
 	this->columns = c;
@@ -98,12 +115,19 @@ Matrix::Matrix(int** els, int r, int c)
 	{
 		this->els[i] = new int[this->columns];
 	}
-	for (int i = 0; i < this->rows; i++)
+	if (!fillWithRandomElements)
 	{
-		for (int j = 0; j < this->columns; j++)
+		for (int i = 0; i < this->rows; i++)
 		{
-			this->els[i][j] = els[i][j];
+			for (int j = 0; j < this->columns; j++)
+			{
+				this->els[i][j] = els[i][j];
+			}
 		}
+	}
+	else
+	{
+		this->fillMatrixWithRandomElemets();
 	}
 }
 
@@ -133,6 +157,18 @@ Matrix::~Matrix()
 		delete[]this->els[i];
 	}
 	//delete[]this->els;
+}
+
+void Matrix::fillMatrixWithRandomElemets()
+{
+	srand(time(0));
+	for (int i = 0; i < this->rows; i++)
+	{
+		for (int j = 0; j < this->columns; j++)
+		{
+			this->els[i][j] = rand() % 1000;
+		}
+	}
 }
 
 void Matrix::clearElsMem()
@@ -166,6 +202,7 @@ int Matrix::matrixMultRowOnColumn(int* a, int* b)
 
 void Matrix::outMatr()
 {
+	//matr_latch.lock();
 	for (int i = 0; i < this->rows; i++)
 	{
 		for (int j = 0; j < this->columns; j++)
@@ -174,6 +211,7 @@ void Matrix::outMatr()
 		}
 		std::cout << std::endl;
 	}
+	//matr_latch.unlock();
 }
 
 void Matrix::outMatr(Matrix& m)
@@ -202,7 +240,7 @@ void Matrix::staticOutMatr(Matrix& m)
 
 Matrix Matrix::operator+(const Matrix& m)
 {
-	std::cout << "Sum start" << std::endl;
+	std::cout << "Sum start on thread id: " <<std::this_thread::get_id()<< std::endl;
 	Matrix result(this->els, this->columns, m.rows);
 	for (int i = 0; i < this->rows; i++)
 	{
@@ -212,7 +250,7 @@ Matrix Matrix::operator+(const Matrix& m)
 			std::this_thread::sleep_for(50ms);
 		}
 	}
-	std::cout << "Sum ended" << std::endl;
+	std::cout << "Sum ended on thread id: " << std::this_thread::get_id() << std::endl;
 	return result;
 }
 
@@ -240,7 +278,7 @@ Matrix& Matrix::operator=(const Matrix& m)
 
 Matrix Matrix::operator-(const Matrix& m)
 {
-	std::cout << "Sub start\n";
+	std::cout << "Sub start on thread id: " << std::this_thread::get_id() << std::endl;
 	Matrix result(this->els, this->columns, m.rows);
 	for (int i = 0; i < this->rows; i++)
 	{
@@ -250,13 +288,13 @@ Matrix Matrix::operator-(const Matrix& m)
 			std::this_thread::sleep_for(50ms);
 		}
 	}
-	std::cout << "Sub ended\n";
+	std::cout << "Sub ended on thread id: " << std::this_thread::get_id() << std::endl;
 	return result;
 }
 
 Matrix Matrix::operator*(const Matrix& m)
 {
-	std::cout << "Mult start\n";
+	std::cout << "Mult start on thread id: " << std::this_thread::get_id() << std::endl;
 	Matrix result(this->els, this->columns, m.rows);
 	for (int i = 0; i < m.rows; i++)
 	{
@@ -268,7 +306,7 @@ Matrix Matrix::operator*(const Matrix& m)
 			std::this_thread::sleep_for(50ms);
 		}
 	}
-	std::cout << "Mult ended\n";
+	std::cout << "Mult ended on thread id: " << std::this_thread::get_id() << std::endl;
 	return result;
 }
 

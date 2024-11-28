@@ -10,11 +10,12 @@ class Matrix
 	int columns;
 	int rows;
 public:
-	Matrix();
-	Matrix(int r, int c);
-	Matrix(int** els, int r, int c);
+	Matrix(bool fillWithRandomElements = false);
+	Matrix(int r, int c, bool fillWithRandomElements = false);
+	Matrix(int** els, int r, int c, bool fillWithRandomElements = false);
 	Matrix(const Matrix& m);
 	~Matrix();
+	void fillMatrixWithRandomElemets();
 	void clearElsMem();
 	int* getColumn(int j) const;
 	int matrixMultRowOnColumn(int* a, int* b);
